@@ -1,5 +1,6 @@
 package cn.how2j.diytomcat.http;
 
+import cn.how2j.diytomcat.catalina.Connector;
 import cn.how2j.diytomcat.catalina.Context;
 import cn.how2j.diytomcat.catalina.Engine;
 import cn.how2j.diytomcat.catalina.Service;
@@ -27,7 +28,7 @@ public class Request extends BaseRequest {
     private String uri;
     private Socket socket;
     private Context context;
-    private Service service;
+    private Connector connector;
     private String method;
     private String queryString;
     private Map<String, String[]> parameterMap;
@@ -35,11 +36,11 @@ public class Request extends BaseRequest {
     private Cookie[] cookies;
     private HttpSession session;
 
-    public Request(Socket socket, Service service) throws IOException {
+    public Request(Socket socket, Connector connector) throws IOException {
         this.parameterMap = new HashMap();
         this.headerMap = new HashMap<>();
         this.socket = socket;
-        this.service = service;
+        this.connector = connector;
         parseHttpRequest();
         if (StrUtil.isEmpty(requestString))
             return;
@@ -74,7 +75,7 @@ public class Request extends BaseRequest {
     }
 
     private void parseContext() {
-        Engine engine = service.getEngine();
+        Engine engine = connector.getService().getEngine();
         context = engine.getDefaultHost().getContext(uri);
         if (null != context)
             return;
@@ -320,6 +321,10 @@ public class Request extends BaseRequest {
         return url;
     }
 
+    public Connector getConnector() {
+        return connector;
+    }
+
     public String getServletPath() {
         return uri;
     }
@@ -327,6 +332,7 @@ public class Request extends BaseRequest {
     public HttpSession getSession() {
         return session;
     }
+
     public void setSession(HttpSession session) {
         this.session = session;
     }

@@ -197,8 +197,8 @@ public class TestTomcat {
     }
 
     private byte[] getContentBytes(String uri, boolean gzip) {
-        String url = StrUtil.format("http://{}:{}{}", ip, port, uri);
-        return MiniBrowser.getContentBytes(url, false);
+        String url = StrUtil.format("http://{}:{}{}", ip,port,uri);
+        return MiniBrowser.getContentBytes(url,gzip);
     }
 
     private String getContentString(String uri) {
@@ -216,5 +216,13 @@ public class TestTomcat {
     private void containAssert(String html, String string) {
         boolean match = StrUtil.containsAny(html, string);
         Assert.assertTrue(match);
+    }
+
+    @Test
+    public void testGzip() {
+        byte[] gzipContent = getContentBytes("/",true);
+        byte[] unGzipContent = ZipUtil.unGzip(gzipContent);
+        String html = new String(unGzipContent);
+        Assert.assertEquals(html, "Hello DIY Tomcat from how2j.cn");
     }
 }
